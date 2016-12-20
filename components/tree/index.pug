@@ -1,0 +1,16 @@
+mixin tree(props)
+  section(data-component='tree')
+    .wrapper
+      .tree
+        canvas#canvas(width=500, height=500)
+      p!='Hover or touch space'
+      aside.controls
+        section
+          .slider
+            label(for='ctrl-angle')!='Angle:'
+            input#ctrl-angle(type='range', min=0, max=1, step='0.001', class='ctrl-angle', value=1.000)
+
+          .slider
+            label(for='ctrl-multiplier')!='Length Multiplier:'
+            input#ctrl-multiplier(type='range', min=0, max=1, step=0.001, class='ctrl-multiplier', value=1)
+    .debug!='Some debug'

@@ -1,0 +1,21 @@
+include ../tree/index
+
+doctype html
+html
+  head
+    title!= props.title
+    meta(name='viewport', content='width=device-width, initial-scale=1, user-scalable=no')
+    meta(name="description" content="")
+    meta(property="og:title" content="")
+    meta(property="og:description" content="")
+    meta(property="og:image" content="")
+    meta(name="twitter:card" content="summary")
+    meta(name="twitter:site" content="")
+    link(rel="icon" href="/content/favicon.ico")
+    link(rel="apple-touch-icon" href="/content/apple-touch-icon.png")
+    script(src='bundle/bundle.js')
+    link(href='bundle/bundle.css', rel='stylesheet', type='text/css')
+    each l in props.externalLinks
+      link&attributes(l.attributes)
+  body
+    +tree(props.tree)

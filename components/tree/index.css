@@ -1,0 +1,26 @@
+[data-component='tree'] {
+  width: 99%;
+  height: 75%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+  & > * {
+    box-sizing: border-box;
+  }
+  & .slider {
+    & > input {
+      display: block;
+      width: 100%;
+    }
+  }
+  & canvas {
+    border: 1px solid violet;
+  }
+
+  & .debug {
+    & span {
+      display: block;
+      color: white;
+    }
+  }
+}
