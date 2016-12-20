@@ -172,6 +172,7 @@ class Tree {
     let elementBounds = this.element.getBoundingClientRect()
     this.canvas.width = elementBounds.width
     this.canvas.height = elementBounds.height
+    this.draw()
   }
 
 /**
