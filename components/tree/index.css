@@ -7,6 +7,9 @@
   & > * {
     box-sizing: border-box;
   }
+  & .controls {
+    padding: 1em;
+  }
   & .slider {
     & > input {
       display: block;
@@ -17,6 +20,7 @@
     border: 1px solid violet;
   }
   & .debug {
+    padding: 1em;
     & span {
       display: block;
       color: white;
