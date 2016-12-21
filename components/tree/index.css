@@ -16,6 +16,19 @@
       width: 100%;
     }
   }
+  & button {
+    background: violet;
+    padding: .5em 1em;
+    margin: 0 0 1em 0;
+    outline: 0;
+    border: 0;
+    transition: background .3s ease;
+    cursor: pointer;
+    &:hover,
+    &:focus {
+      background: purple;
+    }
+  }
   & canvas {
     border: 1px solid violet;
   }

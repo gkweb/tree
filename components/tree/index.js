@@ -61,6 +61,7 @@ class Tree {
     this.ctx = this.canvas.getContext('2d')
     this.rangeAngle = this.element.querySelector('.ctrl-angle')
     this.rangeMultiplier = this.element.querySelector('.ctrl-multiplier')
+    this.btnGenerate = this.element.querySelector('.generate')
     this.branches = []
     this.leaves = []
     this.settings = {}
@@ -68,8 +69,12 @@ class Tree {
     this.settings.maxAngle = Math.PI / 4
     this.settings.multiplier = 0.67
     this.settings.maxMultiplier = 0.67
-    this.settings.maxStartLength = 100
-    this.settings.length = 100
+    this.settings.maxStartLength = this.canvas.height / 4
+    // Store random values for performance
+    // Also feels more fluid when interacting
+    this.settings.random = []
+    this.genRandomValues()
+    this.settings.length = this.canvas.height / 4
     this.debug = {}
     this.debug.runs = 0
     this.settings.cycle = 0.5
@@ -91,6 +96,11 @@ class Tree {
       this.setDebug()
       this.draw()
     })
+    this.btnGenerate.addEventListener('click', event => {
+      this.genRandomValues()
+      this.settings.cycle = 0.5
+      this.loop()
+    })
     this.rangeMultiplier.addEventListener('input', event => {
       this.settings.multiplier = this.rangeMultiplier.value * this.settings.maxMultiplier
       this.draw()
@@ -110,6 +120,15 @@ class Tree {
       this.draw()
       this.setDebug()
     })
+  }
+
+  /**
+   * Regenerates random values. Tree angles are multipled by randomness
+   */
+  genRandomValues () {
+    this.settings.random = []
+    this.settings.random.push(Math.random())
+    this.settings.random.push(Math.random())
   }
 
   /**
@@ -145,12 +164,6 @@ class Tree {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     this.ctx.translate(this.canvas.width / 2, this.canvas.height)
     this.branch(this.settings.length)
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0)
-    this.ctx.translate(this.canvas.width / 2, 0)
-    this.ctx.rotate((Math.PI * -1))
-    this.branch(this.settings.length)
-    this.addLeaves()
-    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2)
   }
 
   /**
@@ -173,7 +186,7 @@ class Tree {
     this.ctx.translate(0, -len)
     if (len > 7) {
       this.ctx.save()
-      this.ctx.rotate(this.settings.angle)
+      this.ctx.rotate(this.settings.angle * this.settings.random[0])
       this.branches.push(
         new Branch({
           x: 0,
@@ -184,7 +197,7 @@ class Tree {
       ))
       this.branch(len * this.settings.multiplier)
       this.ctx.restore()
-      this.ctx.rotate(-this.settings.angle)
+      this.ctx.rotate(-this.settings.angle * this.settings.random[1])
       this.branches.push(
         new Branch({
           x: 0,
@@ -203,18 +216,6 @@ class Tree {
       })
       )
     }
-  }
-  /**
-   * Adds leaves to tree
-   */
-  addLeaves () {
-    this.leaves.push(new Leaf({
-      x: 0,
-      y: 0,
-      ctx: this.ctx,
-      length: 20
-    })
-    )
   }
 
   /**
