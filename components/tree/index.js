@@ -20,6 +20,32 @@ class Branch {
     this.ctx.moveTo(0, 0)
     this.ctx.lineTo(this.x, this.y)
     this.ctx.stroke()
+    this.ctx.closePath()
+  }
+}
+
+class Leaf {
+  /**
+   * @param {Object} options -
+   * @param {Float} x - end x value
+   * @param {Float} y - end y value
+   * @param {Float} length - length value
+   */
+  constructor (options) {
+    this.x = options.x
+    this.y = options.y
+    this.length = options.length
+    this.ctx = options.ctx
+    this.angle = Math.PI
+    this.drawLeaf()
+  }
+  /**
+   * Draws the ellipse onto canvas at specified coords
+   */
+  drawLeaf () {
+    // this.ctx.ellipse(this.x, this.y, this.x + 20, this.y + 20, 0, 45 * Math.PI/180, 0, 2 * Math.PI)
+    this.ctx.fillStyle = 'lightgreen'
+    this.ctx.fillRect(this.x, this.y, 5, 5)
   }
 }
 
@@ -36,6 +62,7 @@ class Tree {
     this.rangeAngle = this.element.querySelector('.ctrl-angle')
     this.rangeMultiplier = this.element.querySelector('.ctrl-multiplier')
     this.branches = []
+    this.leaves = []
     this.settings = {}
     this.settings.angle = Math.PI / 4
     this.settings.maxAngle = Math.PI / 4
@@ -46,6 +73,7 @@ class Tree {
     this.debug = {}
     this.debug.runs = 0
     this.settings.cycle = 0.5
+    this.settings.count = 0
     this.settings.loop = {}
     this.settings.loop.interval = 60 / 1000 // fps / 1000 milliseconds
     this.settings.loop.now = 0
@@ -65,8 +93,8 @@ class Tree {
     })
     this.rangeMultiplier.addEventListener('input', event => {
       this.settings.multiplier = this.rangeMultiplier.value * this.settings.maxMultiplier
-      this.setDebug()
       this.draw()
+      this.setDebug()
     })
 
     this.canvas.addEventListener('mousemove', event => {
@@ -80,6 +108,7 @@ class Tree {
       this.settings.multiplier = posYPerc * this.settings.maxMultiplier
       this.settings.angle = posXPerc * this.settings.maxAngle
       this.draw()
+      this.setDebug()
     })
   }
 
@@ -111,14 +140,16 @@ class Tree {
    * Draws the branches
    */
   draw () {
-    this.ctx.resetTransform()
+    this.settings.count = 0
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     this.ctx.translate(this.canvas.width / 2, this.canvas.height)
     this.branch(this.settings.length)
-    this.ctx.resetTransform()
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0)
     this.ctx.translate(this.canvas.width / 2, 0)
     this.ctx.rotate((Math.PI * -1))
     this.branch(this.settings.length)
+    this.addLeaves()
     this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2)
   }
 
@@ -126,43 +157,64 @@ class Tree {
    * @param {Float} len - Length of branch
    */
   branch (len) {
-    this.ctx.strokeStyle = 'brown'
-    if (len <= 7) this.ctx.strokeStyle = 'green'
-    this.ctx.lineWidth = 1
-    if (len === this.settings.startLength) this.ctx.lineWidth = 5
+    this.settings.count++
+    this.ctx.strokeStyle = 'saddlebrown'
+    if (len <= 7) this.ctx.strokeStyle = '#006400'
+    // Calc line width as percentage of max linewidth
+    this.ctx.lineWidth = (len / this.settings.length) * 10
     this.branches.push(
-      new Branch(
-        { x: 0,
-          y: -len,
-          ctx: this.ctx,
-          length: len
-        }
+      new Branch({
+        x: 0,
+        y: -len,
+        ctx: this.ctx,
+        length: len
+      }
     ))
     this.ctx.translate(0, -len)
-    if (len > 4) {
+    if (len > 7) {
       this.ctx.save()
       this.ctx.rotate(this.settings.angle)
       this.branches.push(
-        new Branch(
-          { x: 0,
-            y: -len,
-            ctx: this.ctx,
-            length: len
-          }
+        new Branch({
+          x: 0,
+          y: -len * this.settings.multiplier,
+          ctx: this.ctx,
+          length: len * this.settings.multiplier
+        }
       ))
       this.branch(len * this.settings.multiplier)
       this.ctx.restore()
       this.ctx.rotate(-this.settings.angle)
       this.branches.push(
-        new Branch(
-          { x: 0,
-            y: -len,
-            ctx: this.ctx,
-            length: len
-          }
+        new Branch({
+          x: 0,
+          y: -len * this.settings.multiplier,
+          ctx: this.ctx,
+          length: len * this.settings.multiplier
+        }
       ))
       this.branch(len * this.settings.multiplier)
+    } else {
+      this.leaves.push(new Leaf({
+        x: 0,
+        y: -len,
+        ctx: this.ctx,
+        length: 5
+      })
+      )
     }
+  }
+  /**
+   * Adds leaves to tree
+   */
+  addLeaves () {
+    this.leaves.push(new Leaf({
+      x: 0,
+      y: 0,
+      ctx: this.ctx,
+      length: 20
+    })
+    )
   }
 
   /**
@@ -194,6 +246,7 @@ class Tree {
   setDebug () {
     // this.debug.innerHTML =
     document.querySelector('.debug').innerHTML = `
+      <span class='cycle'>Count: ${this.settings.count}</span>
       <span class='cycle'>Cycle: ${this.settings.cycle}</span>
       <span class='angle'>Angle: ${this.settings.angle} : ${typeof this.settings.angle}</span>
       <span class='multiplier'>Multiplier: ${this.settings.multiplier}</span>
@@ -201,4 +254,4 @@ class Tree {
   }
 }
 
-export {Branch, Tree}
+export {Branch, Tree, Leaf}
